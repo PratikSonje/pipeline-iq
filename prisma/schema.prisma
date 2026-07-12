@@ -63,6 +63,8 @@ model Contact {
   companyId String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   deals     Deal[]
+
+  @@index([companyId])
 }
 
 model Stage {
@@ -97,6 +99,11 @@ model Deal {
   user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   activities Activity[]
+
+  @@index([companyId])
+  @@index([contactId])
+  @@index([stageId])
+  @@index([userId])
 }
 
 model Activity {
@@ -110,4 +117,7 @@ model Activity {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([dealId])
+  @@index([userId])
 }
