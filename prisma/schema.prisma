@@ -1,13 +1,113 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  SALES_REP
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+}
+
+enum ActivityType {
+  NOTE
+  CALL
+  EMAIL
+}
+
+model User {
+  id          String    @id @default(uuid())
+  clerkUserId String    @unique
+  email       String    @unique
+  name        String
+  role        Role      @default(SALES_REP)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  deals      Deal[]
+  activities Activity[]
+}
+
+model Company {
+  id        String    @id @default(uuid())
+  name      String
+  website   String?
+  industry  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  contacts Contact[]
+  deals    Deal[]
+}
+
+model Contact {
+  id        String    @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  deals     Deal[]
+}
+
+model Stage {
+  id          String @id @default(uuid())
+  name        String
+  order       Int
+  probability Int    @default(0) // 0 to 100
+
+  deals Deal[]
+}
+
+model Deal {
+  id                String     @id @default(uuid())
+  title             String
+  amount            Float      @default(0)
+  expectedCloseDate DateTime?
+  status            DealStatus @default(OPEN)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  deletedAt         DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  stageId String
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Restrict)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  activities Activity[]
+}
+
+model Activity {
+  id        String       @id @default(uuid())
+  type      ActivityType @default(NOTE)
+  content   String       @db.Text
+  createdAt DateTime     @default(now())
+
+  dealId String
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
 }
