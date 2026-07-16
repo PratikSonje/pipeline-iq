@@ -21,6 +21,7 @@ enum ActivityType {
   NOTE
   CALL
   EMAIL
+  MEETING
 }
 
 model User {
@@ -35,6 +36,7 @@ model User {
 
   deals      Deal[]
   activities Activity[]
+  tasks      Task[]
 }
 
 model Company {
@@ -111,6 +113,8 @@ model Activity {
   type      ActivityType @default(NOTE)
   content   String       @db.Text
   createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  deletedAt DateTime?
 
   dealId String
   deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
@@ -119,5 +123,20 @@ model Activity {
   user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@index([dealId])
+  @@index([userId])
+}
+
+model Task {
+  id        String    @id @default(uuid())
+  title     String
+  dueDate   DateTime?
+  completed Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
