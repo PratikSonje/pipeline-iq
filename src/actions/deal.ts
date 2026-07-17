@@ -84,9 +84,20 @@ export async function updateDealStage(dealId: string, newStageId: string) {
       throw new Error("Unauthorized to modify this deal");
     }
 
+    // Determine the deal status based on the new stage
+    const targetStage = await prisma.stage.findUnique({ where: { id: validatedData.newStageId } });
+    let newStatus = "OPEN";
+    if (targetStage) {
+      if (targetStage.name === "Closed Won") newStatus = "WON";
+      else if (targetStage.name === "Closed Lost") newStatus = "LOST";
+    }
+
     await prisma.deal.update({
       where: { id: validatedData.dealId },
-      data: { stageId: validatedData.newStageId },
+      data: { 
+        stageId: validatedData.newStageId,
+        status: newStatus as any
+      },
     });
 
     revalidatePath("/pipeline");

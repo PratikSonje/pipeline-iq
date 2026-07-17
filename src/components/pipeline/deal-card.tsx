@@ -66,7 +66,7 @@ export function DealCard({ deal, stageName }: { deal: DealType, stageName?: stri
       ref={setNodeRef}
       style={style}
       className={cn(
-        "deal-card bg-white/5 backdrop-blur-md p-3 rounded-lg border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] group hover:bg-white/10 transition-colors cursor-grab active:cursor-grabbing flex flex-col gap-2 border-l-4",
+        "deal-card touch-none bg-white/5 backdrop-blur-md p-3 rounded-lg border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] group hover:bg-white/10 transition-colors cursor-grab active:cursor-grabbing flex flex-col gap-2 border-l-4",
         stageStyle.border
       )}
       {...attributes}

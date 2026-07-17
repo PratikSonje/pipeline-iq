@@ -203,6 +203,50 @@ export function AnimatedLanding({ userId }: { userId: string | null }) {
             </motion.div>
           </div>
         </section>
+        {/* FAQ Section */}
+        <section className="py-20 px-8 relative z-10 border-t border-white/10 bg-black/40">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">Frequently Asked Questions</h2>
+              <p className="text-slate-400">Everything you need to know about PipelineIQ.</p>
+            </motion.div>
+            
+            <div className="grid gap-6">
+              {[
+                {
+                  q: "What is PipelineIQ?",
+                  a: "PipelineIQ is a modern, Kanban-first CRM software built specifically for B2B sales teams to manage their deals, contacts, and companies."
+                },
+                {
+                  q: "Is PipelineIQ free to use?",
+                  a: "Yes, PipelineIQ offers a completely free tier for individuals and small teams to manage their sales pipeline."
+                },
+                {
+                  q: "How does the Kanban deal board work?",
+                  a: "The Kanban board allows you to visually drag and drop deals through customizable stages, automatically updating your forecasted revenue based on stage probabilities."
+                }
+              ].map((faq, idx) => (
+                <motion.div 
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm"
+                >
+                  <h3 className="text-xl font-medium text-white mb-3">{faq.q}</h3>
+                  <p className="text-slate-400 leading-relaxed">{faq.a}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}

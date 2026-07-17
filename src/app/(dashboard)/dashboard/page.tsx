@@ -6,22 +6,21 @@ import { CircleDollarSign, TrendingUp, Trophy } from "lucide-react";
 export default async function DashboardPage() {
   const { userId } = await auth();
 
-  // Fetch all active deals with their stages
+  // Fetch all deals (Open, Won, Lost) for the charts so the dashboard never looks empty
   const deals = await prisma.deal.findMany({
     where: { 
       deletedAt: null,
-      status: "OPEN",
     },
     include: { stage: true }
   });
 
-  // Calculate High-level Metrics
-  const totalPipeline = deals.reduce((acc, deal) => acc + deal.amount, 0);
-  const weightedForecast = deals.reduce((acc, deal) => acc + (deal.amount * (deal.stage.probability / 100)), 0);
+  // Calculate High-level Metrics (Exclude Lost deals from pipeline value)
+  const activeAndWonDeals = deals.filter(d => d.status !== "LOST");
+  const totalPipeline = activeAndWonDeals.reduce((acc, deal) => acc + deal.amount, 0);
+  const weightedForecast = activeAndWonDeals.reduce((acc, deal) => acc + (deal.amount * (deal.stage.probability / 100)), 0);
   
-  const wonDealsCount = await prisma.deal.count({
-    where: { deletedAt: null, status: "WON" }
-  });
+  // Calculate Deals Won
+  const wonDealsCount = deals.filter(d => d.status === "WON").length;
 
   // Calculate data for Pie Chart (Deals by Stage)
   const stageMap = new Map<string, number>();

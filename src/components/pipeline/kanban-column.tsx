@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { DealCard } from "./deal-card";
@@ -36,9 +37,10 @@ export function KanbanColumn({
   });
 
   const totalAmount = deals.reduce((sum, deal) => sum + deal.amount, 0);
+  const dealIds = useMemo(() => deals.map((d) => d.id), [deals]);
 
   return (
-    <div className="flex flex-col bg-white/5 backdrop-blur-md rounded-2xl w-[320px] shrink-0 border border-white/10 h-full max-h-full shadow-xl">
+    <div className="flex flex-col bg-white/5 backdrop-blur-md rounded-2xl w-full md:w-[320px] shrink-0 border border-white/10 md:h-full max-h-[500px] md:max-h-full shadow-xl">
       {/* Column Header */}
       <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 rounded-t-2xl shrink-0">
         <div className="flex items-center gap-2">
@@ -59,7 +61,7 @@ export function KanbanColumn({
           isOver ? "bg-white/10" : ""
         }`}
       >
-        <SortableContext items={deals.map(d => d.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext items={dealIds} strategy={verticalListSortingStrategy}>
           {deals.map(deal => (
             <DealCard key={deal.id} deal={deal} stageName={stage.name} />
           ))}

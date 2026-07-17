@@ -11,12 +11,14 @@ import {
   useSensors,
   DragStartEvent,
   DragOverEvent,
-  DragEndEvent
+  DragEndEvent,
+  TouchSensor
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./kanban-column";
 import { DealCard } from "./deal-card";
 import { updateDealStage } from "@/actions/deal";
+import confetti from "canvas-confetti";
 
 type DealType = {
   id: string;
@@ -95,7 +97,13 @@ export function KanbanBoard({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Requires a 5px movement before dragging starts (prevents accidental drags when clicking)
+        distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -168,10 +176,22 @@ export function KanbanBoard({
     const originalDeal = initialDeals.find(d => d.id === activeId);
     
     if (originalDeal && originalDeal.stageId !== deal.stageId) {
+      const newStage = stages.find(s => s.id === deal.stageId);
+      
       // Trigger the server action if the stage changed
       startTransition(async () => {
         try {
           await updateDealStage(activeId, deal.stageId);
+          
+          // Trigger celebration if moved to "Closed Won"
+          if (newStage && newStage.name === "Closed Won") {
+            confetti({
+              particleCount: 150,
+              spread: 80,
+              origin: { y: 0.6 },
+              colors: ['#10b981', '#3b82f6', '#f59e0b', '#ffffff'] // Emerald, Blue, Amber, White
+            });
+          }
         } catch (error) {
           console.error("Failed to update deal stage:", error);
           // Rollback on error
@@ -195,7 +215,7 @@ export function KanbanBoard({
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        className={`flex gap-6 h-full overflow-x-auto pb-4 px-8 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${isPanning ? "cursor-grabbing" : "cursor-grab"}`}
+        className={`flex flex-col md:flex-row gap-6 h-full overflow-y-auto md:overflow-x-auto pb-4 px-4 md:px-8 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${isPanning ? "cursor-grabbing" : "cursor-grab"}`}
       >
         {stages.map(stage => (
           <KanbanColumn 
